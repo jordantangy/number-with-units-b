@@ -1,0 +1,10 @@
+1 km = 1000 m
+1 m = 100 cm
+1 cm = 10 mm
+1 kg = 1000 g
+1 ton = 1000 kg
+1 g = 1000 mg
+1 hour = 60 min
+1 min = 60 sec
+1 EUR = 4.5 ILS
+1 USD = 3.33 ILS 

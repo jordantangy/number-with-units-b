@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "iosfwd": "cpp",
+        "array": "cpp",
+        "chrono": "cpp",
+        "deque": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "memory": "cpp",
+        "optional": "cpp",
+        "string_view": "cpp",
+        "thread": "cpp",
+        "tuple": "cpp",
+        "iostream": "cpp",
+        "typeinfo": "cpp",
+        "iomanip": "cpp"
+    }
+}
