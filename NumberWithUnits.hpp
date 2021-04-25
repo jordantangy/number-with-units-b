@@ -94,15 +94,15 @@ namespace ariel{
                 vec.clear();
                 h.clear();  
             }
-            // for (size_t i = 0; i < v.size(); i++)
-            // {
-            //     for (size_t j = 0; j < v[i].size(); j++)
-            //     {
-            //         cout << v[i][j] ;
-            //     }
-            //     cout << " " << endl;
+            for (size_t i = 0; i < v.size(); i++)
+            {
+                for (size_t j = 0; j < v[i].size(); j++)
+                {
+                    cout << v[i][j] ;
+                }
+                cout << " " << endl;
                 
-            // }
+            }
             
             file.close();
         }
@@ -110,6 +110,7 @@ namespace ariel{
         friend bool related(const string& unit1,const string& unit2);
         friend bool leftToRight(const string& u1, const string& u2);
         friend double rightToLeft(const string& u1, const string& u2);
+        friend bool sameFamily(const string& u1, const string& u2);
     };
     
 
