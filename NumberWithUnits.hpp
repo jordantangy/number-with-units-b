@@ -111,6 +111,7 @@ namespace ariel{
         friend bool leftToRight(const string& u1, const string& u2);
         friend double rightToLeft(const string& u1, const string& u2);
         friend bool sameFamily(const string& u1, const string& u2);
+        friend NumberWithUnits& convert(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2);
     };
     
 

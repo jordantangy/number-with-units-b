@@ -9,21 +9,6 @@
 const double epsylon = 0.001;
 namespace ariel{
 
-
-bool unitsMatch(const string& unit1,const string& unit2) {
-    return (unit1 == unit2);
-}
-bool UnitExists(const string& u1,const string& u2){
-    for (size_t i = 0; i < ariel::NumberWithUnits::v.size(); i++)
-    {
-        if(ariel::NumberWithUnits::v[i][1] == u1 || ariel::NumberWithUnits::v[i][4] == u1 || 
-            ariel::NumberWithUnits::v[i][1] == u2 || ariel::NumberWithUnits::v[i][4] == u2 ){
-            return true;
-        }
-    }
-    return false;   
-}
-
 bool leftToRight(const string& u1, const string& u2){
     for (size_t i = 0; i < ariel::NumberWithUnits::v.size(); i++)
     {
@@ -45,6 +30,41 @@ double rightToLeft(const string& u1, const string& u2){
     return ans;
 }
 
+
+bool unitsMatch(const string& unit1,const string& unit2) {
+    return (unit1 == unit2);
+}
+bool UnitExists(const string& u1,const string& u2){
+    for (size_t i = 0; i < ariel::NumberWithUnits::v.size(); i++)
+    {
+        if(ariel::NumberWithUnits::v[i][1] == u1 || ariel::NumberWithUnits::v[i][4] == u1 || 
+            ariel::NumberWithUnits::v[i][1] == u2 || ariel::NumberWithUnits::v[i][4] == u2 ){
+            return true;
+        }
+    }
+    return false;   
+}
+
+NumberWithUnits& convert(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
+    NumberWithUnits *temp = new NumberWithUnits();
+    vector<string> vec;
+    for(auto line : ariel::NumberWithUnits::v){
+        if(find(line.begin(),line.end(),nwu2.unit) != line.end()){
+            vec = line;
+        }
+    }
+    temp->unit = nwu2.unit;
+    if(leftToRight(nwu2.unit,nwu1.unit)){
+        temp->num = nwu1.num*stod(vec[3]);
+        return *temp;
+    }
+    else {
+        temp->num = nwu1.num+(nwu2.num/rightToLeft(nwu1.unit,nwu2.unit));
+    }
+    return *temp;
+}
+
+
 bool related(const string& unit1,const string& unit2){
     
     for(auto line : ariel::NumberWithUnits::v){
@@ -65,7 +85,7 @@ bool sameFamily(const string& u1, const string& u2){
             }
     }
     vector<vector<string>> copy = extract;
-    //the for loop return at least one line, we extract the units we
+    //the for loop returns at least one line, we extract the units we
     //are looking for and then add to the extract vector the related 
     //equalities between different units
     set<string> s;
@@ -77,19 +97,13 @@ bool sameFamily(const string& u1, const string& u2){
             if(find(line.begin(),line.end(),u1_tofind) != line.end() || 
                 find(line.begin(),line.end(),u2_tofind) != line.end() ){
                     copy.push_back(line);
-                }
-
+            }
         }
-        
     }
     for (size_t i = 0; i < copy.size(); i++)
     {
-        for (size_t i = 0; i < copy[i].size(); i++)
-            {
-                s.insert(copy[i][1]);
-                s.insert(copy[i][4]);
-            }
-            
+        s.insert(copy[i][1]);
+        s.insert(copy[i][4]);
     }
     for(auto unit : s){
         for(auto line : ariel::NumberWithUnits::v){
@@ -98,20 +112,8 @@ bool sameFamily(const string& u1, const string& u2){
             }
         }
     }
-        copy.erase(std::unique(copy.begin(), copy.end()), copy.end());
-        
-    // cout << "extract-----------" << endl;
-    // for (size_t i = 0; i < copy.size(); i++)
-    // {
-    //     for (size_t j = 0; j < copy[i].size(); j++)
-    //     {
-    //         cout << copy[i][j];
-    //     }
-    //     cout << " " << endl;
-        
-    // }
-    
-    //seach for the two given units in the extract matrix
+    copy.erase(std::unique(copy.begin(), copy.end()), copy.end());
+    //seach for the second given units in the extract matrix
     for(auto line : copy){
          if(find(line.begin(),line.end(),u2) != line.end()){
              return true;
@@ -141,17 +143,17 @@ NumberWithUnits& operator+(const NumberWithUnits& nwu1,const NumberWithUnits& nw
                 temp->num = nwu1.num+(stod(vec[3])*nwu2.num);
                 return *temp;
             }
-            else if(!leftToRight(nwu1.unit,nwu2.unit)){
+            else if(!leftToRight(nwu1.unit,nwu2.unit) && (related(nwu1.unit,nwu2.unit))){
                 temp->num = nwu1.num+(nwu2.num/rightToLeft(nwu1.unit,nwu2.unit));
             }
             // else if(!leftToRight(nwu1.unit,nwu2.unit) && (!related(nwu1.unit,nwu2.unit))){
-            //     vector<vector<string>> extract;
-            //     for(auto line : ariel::NumberWithUnits::v){
-            //         if(find(line.begin(),line.end(),nwu1.unit) != line.end() ||
-            //             (find(line.begin(),line.end(),nwu2.unit) != line.end())){
-            //             extract.push_back(line);
-            //         }
-            //     }
+            //     // vector<vector<string>> extract;
+            //     // for(auto line : ariel::NumberWithUnits::v){
+            //     //     if(find(line.begin(),line.end(),nwu1.unit) != line.end() ||
+            //     //         (find(line.begin(),line.end(),nwu2.unit) != line.end())){
+            //     //         extract.push_back(line);
+            //     //     }
+            //     // }
                 
                 
 
@@ -208,7 +210,10 @@ bool operator<=(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
 }
 bool operator==(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2) {
     if(nwu1.unit != nwu2.unit){
-
+        if(sameFamily(nwu1.unit,nwu2.unit)){
+            NumberWithUnits toCheck = convert(nwu1,nwu2);
+             return (unitsMatch(toCheck.unit,nwu2.unit) && (abs(toCheck.num-nwu2.num))<epsylon);
+        }
     }
     return (unitsMatch(nwu1.unit,nwu2.unit) && (abs(nwu1.num-nwu2.num))<epsylon);
 }
