@@ -31,6 +31,7 @@ namespace ariel{
             }
             throw invalid_argument("The specified unit does not exist in the file");
         }
+        NumberWithUnits(const NumberWithUnits& nwu):num{nwu.num},unit{nwu.unit}{}
         
         
         public:
@@ -40,12 +41,12 @@ namespace ariel{
         friend NumberWithUnits& operator-(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2);
         friend NumberWithUnits& operator-(const NumberWithUnits& nwu);
         friend NumberWithUnits& operator-=(NumberWithUnits& nwu1,const NumberWithUnits& nwu2);
-        //postfix
-        NumberWithUnits& operator++(int);
-        NumberWithUnits& operator--(int);
         //prefix
         friend NumberWithUnits& operator++(NumberWithUnits& nwu);
         friend NumberWithUnits& operator--(NumberWithUnits& nwu);
+        //postfix
+        friend NumberWithUnits operator++(NumberWithUnits& nwu,int postfix);
+        friend NumberWithUnits operator--(NumberWithUnits& nwu,int postfix);
 
         friend bool UnitExists(const string& u1,const string& u2);
         friend bool operator>(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2);
@@ -61,17 +62,7 @@ namespace ariel{
         friend double convert_from_to(const std::string& from, const std::string& to);
         friend ostream& operator<<(ostream& os,const NumberWithUnits& nwu);
         static void convertNumType(std::string from_type, std::string to_type);
-
-        friend istream& operator>>(istream& is,NumberWithUnits& nwu){
-            
-            string unit;
-            string e = " ";
-            double num;
-            is >>num>>e>>unit>>e;
-            nwu.num = num;
-            nwu.unit = unit;
-            return is;
-        }
+        friend istream& operator>> (std::istream& input, NumberWithUnits& nwu);
         static void read_units(ifstream& file);
          
         
