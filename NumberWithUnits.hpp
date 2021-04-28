@@ -37,10 +37,10 @@ namespace ariel{
         public:
         friend NumberWithUnits& operator+(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2);
         friend const NumberWithUnits& operator+(const NumberWithUnits& nwu);
-        friend NumberWithUnits& operator+=(NumberWithUnits& nwu1,const NumberWithUnits& nwu2);
+        NumberWithUnits operator+=(const NumberWithUnits& num);
         friend NumberWithUnits& operator-(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2);
         friend NumberWithUnits& operator-(const NumberWithUnits& nwu);
-        friend NumberWithUnits& operator-=(NumberWithUnits& nwu1,const NumberWithUnits& nwu2);
+        NumberWithUnits operator-=(const NumberWithUnits& num);
         //prefix
         friend NumberWithUnits& operator++(NumberWithUnits& nwu);
         friend NumberWithUnits& operator--(NumberWithUnits& nwu);

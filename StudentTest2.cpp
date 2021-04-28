@@ -31,7 +31,7 @@ TEST_CASE("Comperators")
     File << "1 hour = 60 min" << endl;
     File << "1 min = 60 sec" << endl;
     File << "1 EUR = 4.5 ILS" << endl;
-    File << "1 USD = 3.33 ILS ";
+    File << "1 USD = 3.33 ILS";
 
     // Close the file
     File.close();

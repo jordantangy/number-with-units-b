@@ -87,7 +87,6 @@ NumberWithUnits& convert(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2
         return *temp;
     }
     else{
-        cout << nwu1.num << "x" << convert_from_to(nwu2.unit,nwu1.unit) << endl;
         temp->num = nwu1.num*convert_from_to(nwu1.unit,nwu2.unit);
     }
     return *temp;
@@ -153,8 +152,10 @@ NumberWithUnits& operator+(const NumberWithUnits& nwu1,const NumberWithUnits& nw
         }
         else{
             for(auto line : ariel::NumberWithUnits::v){
-                if(find(line.begin(),line.end(),temp->unit) != line.end()){
+                if(find(line.begin(),line.end(),temp->unit) != line.end() && 
+                    find(line.begin(),line.end(),nwu2.unit) != line.end()){
                     vec = line;
+                    break;
                 }
             }
             if(leftToRight(nwu1.unit,nwu2.unit)){
@@ -180,38 +181,14 @@ NumberWithUnits& operator+(const NumberWithUnits& nwu1,const NumberWithUnits& nw
 const NumberWithUnits& operator+(const NumberWithUnits& nwu) {
     return nwu;
 }
-NumberWithUnits& operator+=( NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
-    vector<string> vec;
-    if(UnitExists(nwu1.unit,nwu2.unit) && (sameFamily(nwu1.unit,nwu2.unit))){
-        if(unitsMatch(nwu1.unit,nwu2.unit)){
-            nwu1.num += nwu2.num;
-            return nwu1;
-        }
-        else{
-            for(auto line : ariel::NumberWithUnits::v){
-                if(find(line.begin(),line.end(),nwu1.unit) != line.end()){
-                    vec = line;
-                }
-            }
-            if(leftToRight(nwu1.unit,nwu2.unit)){
-                nwu1.num+=(stod(vec[3])*nwu2.num);
-                return nwu1;
-            }
-            else if(!leftToRight(nwu1.unit,nwu2.unit) && (related(nwu1.unit,nwu2.unit))){
-                nwu1.num+=(nwu2.num/rightToLeft(nwu1.unit,nwu2.unit));
-                return nwu1;
-            }
-            else{
-                nwu1.num+=(convert_from_to(nwu2.unit,nwu1.unit) * nwu2.num);
-                return nwu1;
-            }
-        }
+NumberWithUnits NumberWithUnits::operator+=(const NumberWithUnits& nwu){
+    if(!sameFamily(unit,nwu.unit)){
+        throw("Try to add two different types!");
     }
-    else{
-     throw invalid_argument("Units do not match ["+nwu1.unit+"] cannot be converted to ["+nwu2.unit+"]");
-    }
-    return nwu1;
+    num = num +convert_from_to(nwu.unit,unit)*nwu.num;
+    return *this;
 }
+
 NumberWithUnits& operator-(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
     NumberWithUnits *temp = new NumberWithUnits();
     vector<string> vec;
@@ -223,8 +200,10 @@ NumberWithUnits& operator-(const NumberWithUnits& nwu1,const NumberWithUnits& nw
         }
         else{
             for(auto line : ariel::NumberWithUnits::v){
-                if(find(line.begin(),line.end(),temp->unit) != line.end()){
+                if(find(line.begin(),line.end(),temp->unit) != line.end() && 
+                    find(line.begin(),line.end(),nwu2.unit) != line.end()){
                     vec = line;
+                    break;
                 }
             }
             if(leftToRight(nwu1.unit,nwu2.unit)){
@@ -252,37 +231,12 @@ NumberWithUnits& operator-(const NumberWithUnits& nwu){
     temp->unit = nwu.unit;
     return *temp;
 }
-NumberWithUnits& operator-=(NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
-    vector<string> vec;
-    if(UnitExists(nwu1.unit,nwu2.unit) && (sameFamily(nwu1.unit,nwu2.unit))){
-        if(unitsMatch(nwu1.unit,nwu2.unit)){
-            nwu1.num -= nwu2.num;
-            return nwu1;
-        }
-        else{
-            for(auto line : ariel::NumberWithUnits::v){
-                if(find(line.begin(),line.end(),nwu1.unit) != line.end()){
-                    vec = line;
-                }
-            }
-            if(leftToRight(nwu1.unit,nwu2.unit)){
-                nwu1.num-=(stod(vec[3])*nwu2.num);
-                return nwu1;
-            }
-            else if(!leftToRight(nwu1.unit,nwu2.unit) && (related(nwu1.unit,nwu2.unit))){
-                nwu1.num-=(nwu2.num/rightToLeft(nwu1.unit,nwu2.unit));
-                return nwu1;
-            }
-            else{
-                nwu1.num-=(convert_from_to(nwu2.unit,nwu1.unit) * nwu2.num);
-                return nwu1;
-            }
-        }
+NumberWithUnits NumberWithUnits::operator-=(const NumberWithUnits& nwu){
+    if(!sameFamily(unit,nwu.unit)){
+        throw("Try to add two different types!");
     }
-    else{
-     throw invalid_argument("Units do not match ["+nwu1.unit+"] cannot be converted to ["+nwu2.unit+"]");
-    }
-    return nwu1;
+    num = num -convert_from_to(nwu.unit,unit)*nwu.num;
+    return *this;
 }
 
 NumberWithUnits& operator++(NumberWithUnits& nwu) {
@@ -294,9 +248,10 @@ NumberWithUnits& operator--(NumberWithUnits& nwu){
     return nwu;
 }
 bool operator>(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
-     if(!sameFamily(nwu1.unit,nwu2.unit)){
-         return false;
-         }
+
+    if(!sameFamily(nwu1.unit,nwu2.unit)){
+        throw invalid_argument("Cannot compare those units");
+    }
      if(nwu1.unit == nwu2.unit){
          if(nwu1.num > nwu2.num){
              return true;
@@ -316,7 +271,9 @@ bool operator>=(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
     return ((nwu1 == nwu2) || (nwu1 >nwu2));
 }
 bool operator<(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
-  if(!sameFamily(nwu1.unit,nwu2.unit)){return false;}
+  if(!sameFamily(nwu1.unit,nwu2.unit)){
+        throw invalid_argument("Cannot compare those units");
+    }
      if(nwu1.unit == nwu2.unit){
          if(nwu1.num < nwu2.num){
              return true;
@@ -332,7 +289,9 @@ bool operator<(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
      return false;
 }
 bool operator<=(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
-    if(!sameFamily(nwu1.unit,nwu2.unit)){return false;}
+    if(!sameFamily(nwu1.unit,nwu2.unit)){
+        throw invalid_argument("Cannot compare those units");
+    }
      if(nwu1.unit == nwu2.unit){
          if(nwu1.num <= nwu2.num){
              return true;
@@ -348,18 +307,21 @@ bool operator<=(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
      return false;
 }
 bool operator==(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2) {
+    if(!sameFamily(nwu1.unit,nwu2.unit)){
+        throw invalid_argument("Cannot compare those units");
+    }
     if(nwu1.unit != nwu2.unit){
         if(sameFamily(nwu1.unit,nwu2.unit)){
             NumberWithUnits toCheck = convert(nwu1,nwu2);
-            cout << "abs---------" << abs(toCheck.num-nwu2.num) << endl;
-            cout << nwu1.num << "----" << nwu1.unit <<  "----" << nwu2.num <<  "----" << nwu2.unit <<  "----" << toCheck.num << "-----" << toCheck.unit << endl;
-             return (unitsMatch(toCheck.unit,nwu2.unit) && (abs(toCheck.num-nwu2.num))<epsylon);
+            return (unitsMatch(toCheck.unit,nwu2.unit) && (abs(toCheck.num-nwu2.num))<epsylon);
         }
     }
     return (unitsMatch(nwu1.unit,nwu2.unit) && (abs(nwu1.num-nwu2.num))<epsylon);
 }
 bool operator!=(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
-    if(!sameFamily(nwu1.unit,nwu2.unit)){return false;}
+    if(!sameFamily(nwu1.unit,nwu2.unit)){
+        throw invalid_argument("Cannot compare those units");
+    }
      if(nwu1.unit == nwu2.unit){
          if(nwu1.num != nwu2.num){
              return true;
@@ -435,14 +397,6 @@ void ariel::NumberWithUnits::read_units(ifstream& file){
                 vec.clear();
                 h.clear();  
             }
-            for (size_t i = 0; i < ariel::NumberWithUnits::v.size(); i++)
-            {
-                for (size_t j = 0; j < ariel::NumberWithUnits::v[i].size(); j++)
-                {
-                    cout << ariel::NumberWithUnits::v[i][j] ;
-                }
-                cout << "" << endl;
-            }
             file.clear();
             mapAllCombs(file);
         
@@ -461,43 +415,8 @@ void ariel::NumberWithUnits::read_units(ifstream& file){
         convertNumType(goalUnit,startUnit);
         }
     
-                cout << "---map begin-----" << endl;
-                for(auto line : unitsMap){
-                cout << line.first << " ";
-                map<string,double> m = line.second;
-                for(auto elem : m){
-                    cout << elem.first << " " << elem.second << endl;
-                }
-            
-            cout << "---map end-----" << endl;
-            file.close();
-        }
+        file.close();
     }
-
-//     istream& operator>>(istream& is,NumberWithUnits& nwu){
-
-//         string stream,temp,unit;
-//         double num;
-//         is >> num;
-//         getline(is, stream,']');
-//         int i = 0;
-//         while(stream.at(i) != '[' ){
-//             temp.push_back(stream.at(i));
-//             i++;
-//         }
-//         num = stod(temp);
-//         nwu.num = num;
-//         for (size_t j = i ; j < stream.size()-temp.size()-2; j++)
-//         {
-//             unit.push_back(s.at(j));
-//         }
-//         nwu.unit = unit;
-//         if(unitsMap.find(unit)== unitsMap.end()){
-//         throw invalid_argument("Type does not exist in the units table");
-//     }
-//     return is;
-        
-// }
 
 std::istream& operator>>(std::istream &num, NumberWithUnits &obj){
     string str, unit, check; // 3[cm]
@@ -514,6 +433,5 @@ std::istream& operator>>(std::istream &num, NumberWithUnits &obj){
     return num;
 }
             
-        
-
+    
 }
