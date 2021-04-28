@@ -7,7 +7,7 @@
 #include <algorithm>
 
 const double epsylon = 0.000001;
-map<string , map<string,double>> ariel::NumberWithUnits::mapUnits ;
+map<string , map<string,double>> ariel::NumberWithUnits::mapUnits;
 namespace ariel{
 
     bool leftToRight(const string& u1, const string& u2){
@@ -408,7 +408,7 @@ void ariel::NumberWithUnits::read_units(ifstream& file){
 
 std::istream& operator>>(std::istream& input, NumberWithUnits &nwu){
     string s, unit; 
-    double num;
+    double num = 0;
     input >> num;
     getline(input, s,']'); 
     char space = ' ';
