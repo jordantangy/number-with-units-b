@@ -67,8 +67,9 @@ bool related(const string& unit1,const string& unit2){
     return false;
 }
 
-NumberWithUnits& convert(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
-    NumberWithUnits *temp = new NumberWithUnits();
+NumberWithUnits convert(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
+
+    NumberWithUnits n{nwu1.num,nwu1.unit};
     vector<string> vec;
     for(auto line : ariel::NumberWithUnits::v){
         if(find(line.begin(),line.end(),nwu2.unit) != line.end() && 
@@ -77,19 +78,17 @@ NumberWithUnits& convert(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2
             break;
         }
     }
-    temp->unit = nwu2.unit;
+    n.unit = nwu2.unit;
     if(leftToRight(nwu2.unit,nwu1.unit)){
-        temp->num = nwu1.num*stod(vec[3]);
-        return *temp;
+        n.num = nwu1.num*stod(vec[3]);
     }
     else if(!leftToRight(nwu2.unit,nwu1.unit) && (related(nwu1.unit,nwu2.unit))){
-        temp->num = nwu1.num/rightToLeft(nwu2.unit,nwu1.unit);
-        return *temp;
+        n.num = nwu1.num/rightToLeft(nwu2.unit,nwu1.unit);
     }
     else{
-        temp->num = nwu1.num*convert_from_to(nwu1.unit,nwu2.unit);
+        n.num = nwu1.num*convert_from_to(nwu1.unit,nwu2.unit);
     }
-    return *temp;
+    return n;
 }
 
 
@@ -122,7 +121,7 @@ bool sameFamily(const string& u1, const string& u2){
         s.insert(copy[i][1]);
         s.insert(copy[i][4]);
     }
-    for(auto unit : s){
+    for(auto& unit : s){
         for(auto line : ariel::NumberWithUnits::v){
             if(find(line.begin(),line.end(),unit) != line.end()){
                 copy.push_back(line);
@@ -141,33 +140,30 @@ bool sameFamily(const string& u1, const string& u2){
 }
 
 
-NumberWithUnits& operator+(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
-    NumberWithUnits *temp = new NumberWithUnits();
+NumberWithUnits operator+(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
+
+    NumberWithUnits n{nwu1.num,nwu1.unit};
     vector<string> vec;
     if(UnitExists(nwu1.unit,nwu2.unit) && (sameFamily(nwu1.unit,nwu2.unit))){
-        temp->unit = nwu1.unit;
         if(unitsMatch(nwu1.unit,nwu2.unit)){
-            temp->num = nwu1.num + nwu2.num;
-            return *temp;
+            n.num = nwu1.num + nwu2.num;
         }
         else{
             for(auto line : ariel::NumberWithUnits::v){
-                if(find(line.begin(),line.end(),temp->unit) != line.end() && 
+                if(find(line.begin(),line.end(),n.unit) != line.end() && 
                     find(line.begin(),line.end(),nwu2.unit) != line.end()){
                     vec = line;
                     break;
                 }
             }
             if(leftToRight(nwu1.unit,nwu2.unit)){
-                temp->num = nwu1.num+(stod(vec[3])*nwu2.num);
-                return *temp;
+                n.num = nwu1.num+(stod(vec[3])*nwu2.num);
             }
             else if(!leftToRight(nwu1.unit,nwu2.unit) && (related(nwu1.unit,nwu2.unit))){
-                temp->num = nwu1.num+(nwu2.num/rightToLeft(nwu1.unit,nwu2.unit));
+                n.num = nwu1.num+(nwu2.num/rightToLeft(nwu1.unit,nwu2.unit));
             }
             else{
-                temp->num = nwu1.num+(convert_from_to(nwu2.unit,nwu1.unit) * nwu2.num);
-                return *temp;
+                n.num = nwu1.num+(convert_from_to(nwu2.unit,nwu1.unit) * nwu2.num);
             }
                       
         }
@@ -175,7 +171,7 @@ NumberWithUnits& operator+(const NumberWithUnits& nwu1,const NumberWithUnits& nw
     else{
      throw invalid_argument("Units do not match ["+nwu1.unit+"] cannot be converted to ["+nwu2.unit+"]");
     }
-    return *temp;
+    return n;
     
 }
 const NumberWithUnits& operator+(const NumberWithUnits& nwu) {
@@ -183,57 +179,54 @@ const NumberWithUnits& operator+(const NumberWithUnits& nwu) {
 }
 NumberWithUnits NumberWithUnits::operator+=(const NumberWithUnits& nwu){
     if(!sameFamily(unit,nwu.unit)){
-        throw("Try to add two different types!");
+        throw invalid_argument("Error");
     }
     num = num +convert_from_to(nwu.unit,unit)*nwu.num;
     return *this;
 }
 
-NumberWithUnits& operator-(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
-    NumberWithUnits *temp = new NumberWithUnits();
+NumberWithUnits operator-(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
     vector<string> vec;
+    NumberWithUnits n{nwu1.num,nwu1.unit};
     if(UnitExists(nwu1.unit,nwu2.unit) && (sameFamily(nwu1.unit,nwu2.unit))){
-        temp->unit = nwu1.unit;
         if(unitsMatch(nwu1.unit,nwu2.unit)){
-            temp->num = nwu1.num - nwu2.num;
-            return *temp;
+            n.num = nwu1.num - nwu2.num;
         }
         else{
             for(auto line : ariel::NumberWithUnits::v){
-                if(find(line.begin(),line.end(),temp->unit) != line.end() && 
+                if(find(line.begin(),line.end(),n.unit) != line.end() && 
                     find(line.begin(),line.end(),nwu2.unit) != line.end()){
                     vec = line;
                     break;
                 }
             }
             if(leftToRight(nwu1.unit,nwu2.unit)){
-                temp->num = nwu1.num-(stod(vec[3])*nwu2.num);
-                return *temp;
+                n.num = nwu1.num-(stod(vec[3])*nwu2.num);
             }
             else if(!leftToRight(nwu1.unit,nwu2.unit) && (related(nwu1.unit,nwu2.unit))){
-                temp->num = nwu1.num-(nwu2.num/rightToLeft(nwu1.unit,nwu2.unit));
+                n.num = nwu1.num-(nwu2.num/rightToLeft(nwu1.unit,nwu2.unit));
             }
             else{
-                temp->num = nwu1.num - (convert_from_to(nwu2.unit,nwu1.unit) * nwu2.num);
-                return *temp;
+                n.num = nwu1.num - (convert_from_to(nwu2.unit,nwu1.unit) * nwu2.num);
             }
         }
     }
     else{
      throw invalid_argument("Units do not match ["+nwu1.unit+"] cannot be converted to ["+nwu2.unit+"]");
     }
-    return *temp;
-    
+    return n;
 }
-NumberWithUnits& operator-(const NumberWithUnits& nwu){
-    NumberWithUnits *temp = new NumberWithUnits();
-    temp->num = -nwu.num;
-    temp->unit = nwu.unit;
-    return *temp;
+
+
+NumberWithUnits operator-(const NumberWithUnits& nwu){
+    NumberWithUnits n{-nwu.num,nwu.unit};
+    return n;
 }
+
+
 NumberWithUnits NumberWithUnits::operator-=(const NumberWithUnits& nwu){
     if(!sameFamily(unit,nwu.unit)){
-        throw("Try to add two different types!");
+        throw invalid_argument("Error");
     }
     num = num -convert_from_to(nwu.unit,unit)*nwu.num;
     return *this;
@@ -256,7 +249,6 @@ bool operator>(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
          if(nwu1.num > nwu2.num){
              return true;
          }
-         return false;
      }
      else{
          double coeff = convert_from_to(nwu1.unit,nwu2.unit);
@@ -278,7 +270,6 @@ bool operator<(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
          if(nwu1.num < nwu2.num){
              return true;
          }
-         return false;
      }
      else{
          double coeff = convert_from_to(nwu1.unit,nwu2.unit);
@@ -296,7 +287,6 @@ bool operator<=(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
          if(nwu1.num <= nwu2.num){
              return true;
          }
-         return false;
      }
      else{
          double coeff = convert_from_to(nwu1.unit,nwu2.unit);
@@ -326,7 +316,6 @@ bool operator!=(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
          if(nwu1.num != nwu2.num){
              return true;
          }
-         return false;
      }
      else{
          double coeff = convert_from_to(nwu1.unit,nwu2.unit);
@@ -338,11 +327,11 @@ bool operator!=(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
 }
 
 NumberWithUnits operator*(const NumberWithUnits &nwu,const double &num){
-    NumberWithUnits *temp = new NumberWithUnits();
-    temp->num =num*nwu.num;
-    temp->unit = nwu.unit;
-    return *temp;
+
+    NumberWithUnits n{nwu.num*num,nwu.unit};
+    return n;
 }
+
 NumberWithUnits operator*(const double &num,const NumberWithUnits& nwu){
     return nwu*num;
 }
@@ -360,7 +349,7 @@ ostream& operator<<(ostream& os,const NumberWithUnits& nwu) {
     os << nwu.num << ""<< "["+nwu.unit+"]";
     return os;
 }
-void ariel::NumberWithUnits::convertNumType(std::string from_type, std::string to_type){
+void ariel::NumberWithUnits::convertNumType(const string& from_type, const string& to_type){
         for(auto pairwaise: unitsMap[to_type]){
             if(pairwaise.first != from_type){
                 double number = unitsMap[from_type][to_type]*pairwaise.second;
@@ -403,7 +392,7 @@ void ariel::NumberWithUnits::read_units(ifstream& file){
         }
     void ariel::NumberWithUnits::mapAllCombs(ifstream& file){
          file.seekg(0);
-        if(!file.is_open()) return;
+        if(!file.is_open()) {return;}
         std::string not_needed, startUnit, goalUnit;
         double temp =0 ;
         while(!file.eof())
@@ -418,19 +407,19 @@ void ariel::NumberWithUnits::read_units(ifstream& file){
         file.close();
     }
 
-std::istream& operator>>(std::istream &num, NumberWithUnits &obj){
+std::istream& operator>>(std::istream& input, NumberWithUnits &nwu){
     string str, unit, check; // 3[cm]
     double number_here;
-    num >> number_here;
-    getline(num, str,']'); //[cm]
+    input >> number_here;
+    getline(input, str,']'); //[cm]
     str.erase(remove(str.begin(), str.end(), ' '), str.end());
     str = str.substr(1,str.size()-1);
-    obj.num = number_here;
-    obj.unit = str;
+    nwu.num = number_here;
+    nwu.unit = str;
     if(unitsMap.find(str)== unitsMap.end()){
         throw invalid_argument("Type isn't exist in the units list!!");
     }
-    return num;
+    return input;
 }
             
     

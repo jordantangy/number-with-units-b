@@ -35,12 +35,12 @@ namespace ariel{
         
         
         public:
-        friend NumberWithUnits& operator+(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2);
+        friend NumberWithUnits operator+(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2);
         friend const NumberWithUnits& operator+(const NumberWithUnits& nwu);
-        NumberWithUnits operator+=(const NumberWithUnits& num);
-        friend NumberWithUnits& operator-(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2);
-        friend NumberWithUnits& operator-(const NumberWithUnits& nwu);
-        NumberWithUnits operator-=(const NumberWithUnits& num);
+        NumberWithUnits operator+=(const NumberWithUnits& nwu);
+        friend NumberWithUnits operator-(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2);
+        friend NumberWithUnits operator-(const NumberWithUnits& nwu);
+        NumberWithUnits operator-=(const NumberWithUnits& nwu);
         //prefix
         friend NumberWithUnits& operator++(NumberWithUnits& nwu);
         friend NumberWithUnits& operator--(NumberWithUnits& nwu);
@@ -61,8 +61,8 @@ namespace ariel{
         friend NumberWithUnits operator*(const double &num,const NumberWithUnits &nwu);
         friend double convert_from_to(const std::string& from, const std::string& to);
         friend ostream& operator<<(ostream& os,const NumberWithUnits& nwu);
-        static void convertNumType(std::string from_type, std::string to_type);
-        friend istream& operator>> (std::istream& input, NumberWithUnits& nwu);
+        static void convertNumType(const string& from_type, const string& to_type);
+        friend istream& operator>> (istream& input, NumberWithUnits& nwu);
         static void read_units(ifstream& file);
          
         
@@ -71,7 +71,7 @@ namespace ariel{
         friend bool leftToRight(const string& u1, const string& u2);
         friend double rightToLeft(const string& u1, const string& u2);
         friend bool sameFamily(const string& u1, const string& u2);
-        friend NumberWithUnits& convert(NumberWithUnits& nwu1,NumberWithUnits& nwu2);
+        friend NumberWithUnits convert(NumberWithUnits& nwu1,NumberWithUnits& nwu2);
         static void mapAllCombs(ifstream& file);
          
         
