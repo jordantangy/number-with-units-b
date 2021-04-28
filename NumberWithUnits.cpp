@@ -7,7 +7,7 @@
 #include <algorithm>
 
 const double epsylon = 0.000001;
-std::map<string , map<string,double>> unitsMap;
+std::map<string , map<string,double>> mapUnits;
 namespace ariel{
 
     bool leftToRight(const string& u1, const string& u2){
@@ -31,12 +31,11 @@ double rightToLeft(const string& u1, const string& u2){
     return ans;
 }
 
-double convert_from_to(const std::string& from, const std::string& to) {
-    //distinct between two cases
+double fromTo(const string& from, const string& to) {
     if(from != to) {
-        return unitsMap[from][to];
+        return mapUnits[from][to];
     }
-    return 1;   // The dimensions are equal
+    return 1.0;  
 }
 
 
@@ -86,7 +85,7 @@ NumberWithUnits convert(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2)
         n.num = nwu1.num/rightToLeft(nwu2.unit,nwu1.unit);
     }
     else{
-        n.num = nwu1.num*convert_from_to(nwu1.unit,nwu2.unit);
+        n.num = nwu1.num*fromTo(nwu1.unit,nwu2.unit);
     }
     return n;
 }
@@ -163,9 +162,8 @@ NumberWithUnits operator+(const NumberWithUnits& nwu1,const NumberWithUnits& nwu
                 n.num = nwu1.num+(nwu2.num/rightToLeft(nwu1.unit,nwu2.unit));
             }
             else{
-                n.num = nwu1.num+(convert_from_to(nwu2.unit,nwu1.unit) * nwu2.num);
-            }
-                      
+                n.num = nwu1.num+(fromTo(nwu2.unit,nwu1.unit) * nwu2.num);
+            }       
         }
     }
     else{
@@ -181,7 +179,7 @@ NumberWithUnits NumberWithUnits::operator+=(const NumberWithUnits& nwu){
     if(!sameFamily(unit,nwu.unit)){
         throw invalid_argument("Error");
     }
-    num = num +convert_from_to(nwu.unit,unit)*nwu.num;
+    num = num +fromTo(nwu.unit,unit)*nwu.num;
     return *this;
 }
 
@@ -207,7 +205,7 @@ NumberWithUnits operator-(const NumberWithUnits& nwu1,const NumberWithUnits& nwu
                 n.num = nwu1.num-(nwu2.num/rightToLeft(nwu1.unit,nwu2.unit));
             }
             else{
-                n.num = nwu1.num - (convert_from_to(nwu2.unit,nwu1.unit) * nwu2.num);
+                n.num = nwu1.num - (fromTo(nwu2.unit,nwu1.unit) * nwu2.num);
             }
         }
     }
@@ -228,7 +226,7 @@ NumberWithUnits NumberWithUnits::operator-=(const NumberWithUnits& nwu){
     if(!sameFamily(unit,nwu.unit)){
         throw invalid_argument("Error");
     }
-    num = num -convert_from_to(nwu.unit,unit)*nwu.num;
+    num = num -fromTo(nwu.unit,unit)*nwu.num;
     return *this;
 }
 
@@ -251,7 +249,7 @@ bool operator>(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
          }
      }
      else{
-         double coeff = convert_from_to(nwu1.unit,nwu2.unit);
+         double coeff = fromTo(nwu1.unit,nwu2.unit);
          if(nwu1.num*coeff > nwu2.num){
              return true;
         }
@@ -272,7 +270,7 @@ bool operator<(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
          }
      }
      else{
-         double coeff = convert_from_to(nwu1.unit,nwu2.unit);
+         double coeff = fromTo(nwu1.unit,nwu2.unit);
          if(nwu1.num*coeff < nwu2.num){
              return true;
         }
@@ -289,7 +287,7 @@ bool operator<=(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
          }
      }
      else{
-         double coeff = convert_from_to(nwu1.unit,nwu2.unit);
+         double coeff = fromTo(nwu1.unit,nwu2.unit);
          if(nwu1.num*coeff <= nwu2.num){
              return true;
         }
@@ -318,7 +316,7 @@ bool operator!=(const NumberWithUnits& nwu1,const NumberWithUnits& nwu2){
          }
      }
      else{
-         double coeff = convert_from_to(nwu1.unit,nwu2.unit);
+         double coeff = fromTo(nwu1.unit,nwu2.unit);
          if(nwu1.num*coeff != nwu2.num){
              return true;
         }
@@ -349,12 +347,12 @@ ostream& operator<<(ostream& os,const NumberWithUnits& nwu) {
     os << nwu.num << ""<< "["+nwu.unit+"]";
     return os;
 }
-void ariel::NumberWithUnits::convertNumType(const string& from_type, const string& to_type){
-        for(auto pairwaise: unitsMap[to_type]){
-            if(pairwaise.first != from_type){
-                double number = unitsMap[from_type][to_type]*pairwaise.second;
-                unitsMap[from_type][pairwaise.first] = number;
-                unitsMap[pairwaise.first][from_type] = 1.0/number;
+void ariel::NumberWithUnits::convUnit(const string& from, const string& to){
+        for(auto elem: mapUnits[to]){
+            if(elem.first != from){
+                double number = mapUnits[from][to]*elem.second;
+                mapUnits[from][elem.first] = number;
+                mapUnits[elem.first][from] = 1.0/number;
             }
         }
     }
@@ -391,33 +389,41 @@ void ariel::NumberWithUnits::read_units(ifstream& file){
         
         }
     void ariel::NumberWithUnits::mapAllCombs(ifstream& file){
-         file.seekg(0);
-        if(!file.is_open()) {return;}
-        std::string not_needed, startUnit, goalUnit;
-        double temp =0 ;
-        while(!file.eof())
-        {
-        file>>not_needed>>startUnit>>not_needed>>temp>>goalUnit;  //insert the units to the variables
-        unitsMap[startUnit][goalUnit] = temp;
-        unitsMap[goalUnit][startUnit] = 1.0/temp;
-        convertNumType(startUnit,goalUnit);     //update all the rest
-        convertNumType(goalUnit,startUnit);
+        file.seekg(0);
+        if(!file.is_open()) {
+            return;
+        }
+        string one, from , to;
+        double value =0 ;
+        while(!file.eof()){
+            file>>one>>from>>one>>value>>to;  
+            mapUnits[from][to] = value;
+            mapUnits[to][from] = 1.0/value;
+            convUnit(from,to);   
+            convUnit(to,from);
         }
     
         file.close();
     }
 
 std::istream& operator>>(std::istream& input, NumberWithUnits &nwu){
-    string str, unit, check; // 3[cm]
-    double number_here;
-    input >> number_here;
-    getline(input, str,']'); //[cm]
-    str.erase(remove(str.begin(), str.end(), ' '), str.end());
-    str = str.substr(1,str.size()-1);
-    nwu.num = number_here;
-    nwu.unit = str;
-    if(unitsMap.find(str)== unitsMap.end()){
-        throw invalid_argument("Type isn't exist in the units list!!");
+    string s, unit; 
+    double num;
+    input >> num;
+    getline(input, s,']'); 
+    char space = ' ';
+    char open = '[';
+    char close = ']';
+    for (size_t i = 0; i < s.size(); i++)
+    {
+        if(s[i] != open && s[i] != close &&  s[i] != space ){
+            unit.push_back(s[i]);
+        }
+    }
+    nwu.num = num;
+    nwu.unit = unit;
+    if(mapUnits.find(unit)== mapUnits.end()){
+        throw invalid_argument("This unit does not exist in the list");
     }
     return input;
 }
