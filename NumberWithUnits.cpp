@@ -7,7 +7,7 @@
 #include <algorithm>
 
 const double epsylon = 0.000001;
-std::map<string , map<string,double>> mapUnits;
+map<string , map<string,double>> ariel::NumberWithUnits::mapUnits ;
 namespace ariel{
 
     bool leftToRight(const string& u1, const string& u2){
@@ -33,7 +33,7 @@ double rightToLeft(const string& u1, const string& u2){
 
 double fromTo(const string& from, const string& to) {
     if(from != to) {
-        return mapUnits[from][to];
+        return ariel::NumberWithUnits::mapUnits[from][to];
     }
     return 1.0;  
 }
@@ -120,7 +120,7 @@ bool sameFamily(const string& u1, const string& u2){
         s.insert(copy[i][1]);
         s.insert(copy[i][4]);
     }
-    for(auto& unit : s){
+    for(const auto& unit: s){
         for(auto line : ariel::NumberWithUnits::v){
             if(find(line.begin(),line.end(),unit) != line.end()){
                 copy.push_back(line);
@@ -348,11 +348,11 @@ ostream& operator<<(ostream& os,const NumberWithUnits& nwu) {
     return os;
 }
 void ariel::NumberWithUnits::convUnit(const string& from, const string& to){
-        for(auto elem: mapUnits[to]){
+        for(auto& elem: ariel::NumberWithUnits::mapUnits[to]){
             if(elem.first != from){
-                double number = mapUnits[from][to]*elem.second;
-                mapUnits[from][elem.first] = number;
-                mapUnits[elem.first][from] = 1.0/number;
+                double number = ariel::NumberWithUnits::mapUnits[from][to]*elem.second;
+                ariel::NumberWithUnits::mapUnits[from][elem.first] = number;
+                ariel::NumberWithUnits::mapUnits[elem.first][from] = 1.0/number;
             }
         }
     }
@@ -397,8 +397,8 @@ void ariel::NumberWithUnits::read_units(ifstream& file){
         double value =0 ;
         while(!file.eof()){
             file>>one>>from>>one>>value>>to;  
-            mapUnits[from][to] = value;
-            mapUnits[to][from] = 1.0/value;
+            ariel::NumberWithUnits::mapUnits[from][to] = value;
+            ariel::NumberWithUnits::mapUnits[to][from] = 1.0/value;
             convUnit(from,to);   
             convUnit(to,from);
         }
@@ -422,7 +422,7 @@ std::istream& operator>>(std::istream& input, NumberWithUnits &nwu){
     }
     nwu.num = num;
     nwu.unit = unit;
-    if(mapUnits.find(unit)== mapUnits.end()){
+    if(ariel::NumberWithUnits::mapUnits.find(unit)== ariel::NumberWithUnits::mapUnits.end()){
         throw invalid_argument("This unit does not exist in the list");
     }
     return input;

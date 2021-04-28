@@ -17,6 +17,7 @@ namespace ariel{
         double num;
         string unit;
         static inline vector<vector<string>> v;
+        static map<string, map<string,double>> mapUnits;
         
         NumberWithUnits(){}
         NumberWithUnits(double num, string unit):num(num){
