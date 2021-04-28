@@ -62,7 +62,7 @@ namespace ariel{
         friend NumberWithUnits operator*(const double &num,const NumberWithUnits &nwu);
         friend double fromTo(const string& from, const string& to); //
         friend ostream& operator<<(ostream& os,const NumberWithUnits& nwu);
-        static void convUnit(const string& from_type, const string& to_type);
+        static void convUnit(const string& from, const string& to);
         friend istream& operator>> (istream& input, NumberWithUnits& nwu); 
         static void read_units(ifstream& file); 
          
